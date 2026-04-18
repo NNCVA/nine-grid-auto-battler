@@ -41,6 +41,8 @@ export const useGameLogic = ({ lang, onExitGame }: UseGameLogicProps) => {
   const [turnQueue, setTurnQueue] = useState<string[]>([]);
   const [isProcessingTurn, setIsProcessingTurn] = useState(false);
   const battleIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const gameStateRef = useRef<GameState>(gameState);
+  const turnQueueRef = useRef<string[]>(turnQueue);
 
   const saveGame = () => {
     if (saveGameState(gameState)) {
@@ -78,6 +80,7 @@ export const useGameLogic = ({ lang, onExitGame }: UseGameLogicProps) => {
     setHealMap({});
     setTurnQueue([]);
     setIsProcessingTurn(false);
+    turnQueueRef.current = [];
   };
 
   const handleNextOrReset = () => {
@@ -154,12 +157,22 @@ export const useGameLogic = ({ lang, onExitGame }: UseGameLogicProps) => {
   };
 
   const processNextTurn = useCallback(() => {
-    if (gameState.phase !== 'BATTLE' || isProcessingTurn) {
+    const currentGameState = gameStateRef.current;
+    const currentTurnQueue = turnQueueRef.current;
+
+    if (currentGameState.phase !== 'BATTLE' || isProcessingTurn) {
       return;
     }
 
-    const playerAlive = gameState.units.some((unit) => unit.side === 'PLAYER' && !unit.isDead);
-    const enemyAlive = gameState.units.some((unit) => unit.side === 'ENEMY' && !unit.isDead);
+    let playerAlive = false;
+    let enemyAlive = false;
+    for (const unit of currentGameState.units) {
+      if (!unit.isDead) {
+        if (unit.side === 'PLAYER') playerAlive = true;
+        else if (unit.side === 'ENEMY') enemyAlive = true;
+      }
+      if (playerAlive && enemyAlive) break;
+    }
 
     if (!playerAlive || !enemyAlive) {
       setGameState((previous) =>
@@ -168,19 +181,20 @@ export const useGameLogic = ({ lang, onExitGame }: UseGameLogicProps) => {
       return;
     }
 
-    const selection = getNextTurnSelection(gameState, turnQueue);
+    const selection = getNextTurnSelection(currentGameState, currentTurnQueue);
 
     if (selection.attackerId === null) {
       return;
     }
 
-    if (selection.nextTurn !== gameState.turn) {
+    if (selection.nextTurn !== currentGameState.turn) {
       setGameState((previous) => ({ ...previous, turn: selection.nextTurn }));
     }
 
     setTurnQueue(selection.nextTurnQueue);
+    turnQueueRef.current = selection.nextTurnQueue;
 
-    const attacker = gameState.units.find((unit) => unit.id === selection.attackerId);
+    const attacker = currentGameState.units.find((unit) => unit.id === selection.attackerId);
 
     if (!attacker || attacker.isDead) {
       setIsProcessingTurn(false);
@@ -192,9 +206,10 @@ export const useGameLogic = ({ lang, onExitGame }: UseGameLogicProps) => {
 
     const actionDelay = 400 / battleSpeed;
     const visualDuration = 800 / battleSpeed;
+    const attackerIdRef = selection.attackerId;
 
     battleIntervalRef.current = setTimeout(() => {
-      const resolvedAction = resolveBattleAction(gameState, selection.attackerId!, lang, t);
+      const resolvedAction = resolveBattleAction(gameStateRef.current, attackerIdRef, lang, t);
 
       if (!resolvedAction || !resolvedAction.turnLog || !resolvedAction.targetId) {
         setIsProcessingTurn(false);
@@ -223,12 +238,14 @@ export const useGameLogic = ({ lang, onExitGame }: UseGameLogicProps) => {
     }, actionDelay);
   }, [
     battleSpeed,
-    gameState,
     isProcessingTurn,
     lang,
     t,
-    turnQueue,
   ]);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
 
   useEffect(() => {
     if (gameState.phase === 'BATTLE' && !isProcessingTurn) {

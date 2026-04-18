@@ -67,40 +67,24 @@ export const calculateHeal = (attacker: Unit, isSkill: boolean): DamageResult =>
  * 3. If same row is empty, check adjacent rows (prioritize closest row index).
  * 4. Pick front-most in that row.
  */
+const frontmostUnit = (units: Unit[], side: 'PLAYER' | 'ENEMY'): Unit =>
+  units.sort((a, b) => side === 'PLAYER' ? a.col - b.col : b.col - a.col)[0];
+
 export const findTarget = (attacker: Unit, allUnits: Unit[]): Unit | null => {
   const enemies = allUnits.filter(u => u.side !== attacker.side && !u.isDead);
   if (enemies.length === 0) return null;
 
-  // 1. Check same row
   const sameRowEnemies = enemies.filter(u => u.row === attacker.row);
   if (sameRowEnemies.length > 0) {
-    if (attacker.side === 'PLAYER') {
-       // Player attacks Right (lowest col index of enemy?)
-       // In our grid: Player 0,1,2 | Enemy 0,1,2
-       // "Front" for Player is Col 2. "Front" for Enemy is Col 0.
-       // Player attacks Enemy's "Front" (Col 0).
-       return sameRowEnemies.sort((a, b) => a.col - b.col)[0];
-    } else {
-      // Enemy attacks Player's "Front" (Col 2).
-      return sameRowEnemies.sort((a, b) => b.col - a.col)[0];
-    }
+    return frontmostUnit(sameRowEnemies, attacker.side);
   }
 
-  // 2. Adjacent rows
-  // Sort remaining enemies by row distance, then by "frontline" logic
-  return enemies.sort((a, b) => {
+  return frontmostUnit(enemies.sort((a, b) => {
     const distA = Math.abs(a.row - attacker.row);
     const distB = Math.abs(b.row - attacker.row);
-    
-    if (distA !== distB) return distA - distB; // Closest row first
-
-    // Same distance, pick frontline
-    if (attacker.side === 'PLAYER') {
-      return a.col - b.col;
-    } else {
-      return b.col - a.col;
-    }
-  })[0];
+    if (distA !== distB) return distA - distB;
+    return attacker.side === 'PLAYER' ? a.col - b.col : b.col - a.col;
+  }), attacker.side);
 };
 
 export const findHealTarget = (healer: Unit, allUnits: Unit[]): Unit | null => {
@@ -174,7 +158,7 @@ export const simulateBattle = (
   currentLogs: BattleLogEntry[]
 ): { units: Unit[], logs: BattleLogEntry[], phase: 'VICTORY' | 'DEFEAT', finalTurn: number } => {
   // Deep clone units to avoid mutating state directly
-  const units = JSON.parse(JSON.stringify(initialUnits)) as Unit[];
+  const units = structuredClone(initialUnits) as Unit[];
   const logs = [...currentLogs];
   let turn = initialTurn;
   let queue: string[] = [];
@@ -186,8 +170,15 @@ export const simulateBattle = (
   while (loopCount < MAX_LOOPS) {
     loopCount++;
 
-    const playerAlive = units.some((u: Unit) => u.side === 'PLAYER' && !u.isDead);
-    const enemyAlive = units.some((u: Unit) => u.side === 'ENEMY' && !u.isDead);
+    let playerAlive = false;
+    let enemyAlive = false;
+    for (const u of units) {
+      if (!u.isDead) {
+        if (u.side === 'PLAYER') playerAlive = true;
+        else enemyAlive = true;
+      }
+      if (playerAlive && enemyAlive) break;
+    }
 
     if (!playerAlive || !enemyAlive) {
       return {
@@ -209,7 +200,7 @@ export const simulateBattle = (
     if (!attackerId) continue;
 
     // Find attacker in our local cloned units
-    const attacker = units.find((u: Unit) => u.id === attackerId);
+    const attacker = units.find(u => u.id === attackerId);
     if (!attacker || attacker.isDead) continue;
 
     const isSupport = attacker.role === 'SUPPORT';
@@ -228,7 +219,6 @@ export const simulateBattle = (
         result = calculateDamage(attacker, target, isSkill);
     }
 
-    // Update Attacker Energy
     attacker.stats.energy = isSkill ? 0 : Math.min(MAX_ENERGY, attacker.stats.energy + ENERGY_GAIN_ATTACK);
 
     // Update Target

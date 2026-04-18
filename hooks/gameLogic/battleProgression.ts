@@ -310,17 +310,20 @@ export const simulateDeterministicBattleFlow = ({
   const t = (key: keyof typeof TRANSLATIONS.en) => getTranslation(lang, key);
 
   return withDeterministicRandom(randomValues, () => {
-    let currentState = JSON.parse(JSON.stringify(gameState)) as GameState;
+    let currentState = structuredClone(gameState) as GameState;
     let currentTurnQueue = [...initialTurnQueue];
     let steps = 0;
 
     while (steps < maxSteps) {
-      const playerAlive = currentState.units.some(
-        (unit) => unit.side === 'PLAYER' && !unit.isDead,
-      );
-      const enemyAlive = currentState.units.some(
-        (unit) => unit.side === 'ENEMY' && !unit.isDead,
-      );
+      let playerAlive = false;
+      let enemyAlive = false;
+      for (const unit of currentState.units) {
+        if (!unit.isDead) {
+          if (unit.side === 'PLAYER') playerAlive = true;
+          else enemyAlive = true;
+        }
+        if (playerAlive && enemyAlive) break;
+      }
 
       if (!playerAlive || !enemyAlive) {
         const completedState = buildBattleCompletionState(
@@ -379,12 +382,15 @@ export const simulateDeterministicBattleFlow = ({
       };
     }
 
-    const playerAlive = currentState.units.some(
-      (unit) => unit.side === 'PLAYER' && !unit.isDead,
-    );
-    const enemyAlive = currentState.units.some(
-      (unit) => unit.side === 'ENEMY' && !unit.isDead,
-    );
+    let playerAlive = false;
+    let enemyAlive = false;
+    for (const unit of currentState.units) {
+      if (!unit.isDead) {
+        if (unit.side === 'PLAYER') playerAlive = true;
+        else enemyAlive = true;
+      }
+      if (playerAlive && enemyAlive) break;
+    }
 
     if (!playerAlive || !enemyAlive) {
       const completedState = buildBattleCompletionState(

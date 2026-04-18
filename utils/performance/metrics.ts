@@ -1,11 +1,15 @@
 const activeMeasures = new Map<string, number>();
 const metricStore = new Map<string, number[]>();
+const MAX_METRIC_ENTRIES = 1000;
 
 const roundMetricValue = (value: number) => Number(value.toFixed(4));
 
 const appendMetricValue = (name: string, value: number) => {
   const existing = metricStore.get(name) ?? [];
   existing.push(value);
+  if (existing.length > MAX_METRIC_ENTRIES) {
+    existing.splice(0, existing.length - MAX_METRIC_ENTRIES);
+  }
   metricStore.set(name, existing);
 };
 
@@ -40,8 +44,12 @@ export const getMetricsSummary = () => {
   return Object.fromEntries(
     Array.from(metricStore.entries()).map(([name, values]) => {
       const total = values.reduce((sum, value) => sum + value, 0);
-      const min = Math.min(...values);
-      const max = Math.max(...values);
+      let min = Infinity;
+      let max = -Infinity;
+      for (const v of values) {
+        if (v < min) min = v;
+        if (v > max) max = v;
+      }
 
       return [
         name,

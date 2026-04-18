@@ -1,5 +1,5 @@
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Play, RotateCcw, Swords, Flame, Shield, Timer, Crosshair, Heart, Trophy, Flag, ArrowRight, FastForward, SkipForward, LogOut, Check, ChevronLeft } from 'lucide-react';
 import GameGrid from '../GameGrid';
 import { GameState, Unit } from '../../types';
@@ -8,6 +8,16 @@ import { Language, getTranslation } from '../../utils/i18n';
 import { TRANSLATIONS } from '../../constants/localization';
 import { getTeamSpeed } from '../../services/gameEngine';
 import { recordRender } from '../../utils/performance/renderCounters';
+
+type TranslationKey = keyof typeof TRANSLATIONS.en;
+
+const UNIT_ICONS: Record<string, React.ReactNode> = {
+  KNIGHT: <Shield size={20} />,
+  BERSERKER: <Swords size={20} />,
+  MAGE: <Flame size={20} />,
+  ASSASSIN: <Crosshair size={20} />,
+  PRIEST: <Heart size={20} />,
+};
 
 interface GameScreenProps {
     gameState: GameState;
@@ -29,6 +39,74 @@ interface GameScreenProps {
     };
 }
 
+interface HeaderProps {
+    gameState: GameState;
+    battleSpeed: number;
+    lang: Language;
+    t: (key: keyof typeof TRANSLATIONS.en) => string;
+    toggleSpeed: () => void;
+    handleSkip: () => void;
+    handleExit: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ gameState, battleSpeed, lang, t, toggleSpeed, handleSkip, handleExit }) => (
+    <header className="w-full max-w-7xl flex justify-between items-center mb-4 sm:mb-6 border-b border-gray-700 pb-4 px-2">
+        <div>
+            <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-game-player to-game-accent bg-clip-text text-transparent">
+                {t('title')}
+            </h1>
+            <div className="flex items-center gap-4 mt-1">
+                <div className="flex items-center gap-1 text-yellow-400 font-bold text-sm">
+                    <Flag size={14} />
+                    <span>{t('level')} {gameState.currentLevel}</span>
+                </div>
+                <div className="flex items-center gap-1 text-gray-500 font-bold text-xs">
+                    <Trophy size={12} />
+                    <span>{t('best')}: {gameState.maxLevel}</span>
+                </div>
+            </div>
+        </div>
+
+        <div className="flex gap-2 sm:gap-4 items-center">
+             {gameState.phase === 'BATTLE' && (
+                <div className="flex items-center gap-2">
+                    <div className="text-right hidden sm:block">
+                        <div className="text-xs text-gray-400">{t('turn')}</div>
+                        <div className="text-2xl font-mono text-white">{gameState.turn}</div>
+                    </div>
+                    <div className="flex items-center gap-1 bg-gray-800 rounded border border-gray-600 ml-2 sm:ml-4 overflow-hidden">
+                        <button
+                            onClick={toggleSpeed}
+                            className="flex items-center gap-1 hover:bg-gray-700 px-2 sm:px-3 py-1 transition-colors h-8 sm:h-9 border-r border-gray-600"
+                            title="Toggle Battle Speed"
+                        >
+                            <FastForward size={14} className={battleSpeed > 1 ? "text-yellow-400" : "text-gray-400"} />
+                            <span className="font-mono font-bold text-xs sm:text-sm w-4">{battleSpeed}x</span>
+                        </button>
+                        <button
+                            onClick={handleSkip}
+                            className="flex items-center gap-1 hover:bg-gray-700 px-2 sm:px-3 py-1 transition-colors h-8 sm:h-9 text-blue-400 hover:text-blue-300"
+                            title="Skip Battle"
+                        >
+                            <SkipForward size={14} />
+                            <span className="font-bold text-xs hidden sm:inline">{t('skip')}</span>
+                        </button>
+                    </div>
+                </div>
+             )}
+
+             {(gameState.phase === 'MATCHUP' || gameState.phase === 'FORMATION') && (
+                <button
+                    onClick={handleExit}
+                    className="flex items-center gap-2 px-3 py-2 sm:px-4 rounded-lg font-semibold bg-gray-800 hover:bg-red-900/50 text-gray-400 hover:text-red-400 border border-gray-700 hover:border-red-500/50 transition-all text-sm sm:text-base"
+                >
+                    <LogOut size={16} /> <span className="hidden sm:inline">{t('exit')}</span>
+                </button>
+             )}
+        </div>
+    </header>
+);
+
 const GameScreen: React.FC<GameScreenProps> = ({ 
     gameState, 
     battleSpeed, 
@@ -38,7 +116,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
     actions 
 }) => {
     recordRender('GameScreen');
-    const t = (key: any) => getTranslation(lang, key);
+    const t = useCallback((key: TranslationKey) => getTranslation(lang, key), [lang]);
     const unitTemplates = getAllUnitTemplates();
 
     const playerUnits = useMemo(() => gameState.units.filter(u => u.side === 'PLAYER'), [gameState.units]);
@@ -48,72 +126,12 @@ const GameScreen: React.FC<GameScreenProps> = ({
 
     const playerSpeed = useMemo(() => getTeamSpeed(gameState.units, 'PLAYER'), [gameState.units]);
     const enemySpeed = useMemo(() => getTeamSpeed(gameState.units, 'ENEMY'), [gameState.units]);
-    
-    // Header Component
-    const Header = () => (
-        <header className="w-full max-w-7xl flex justify-between items-center mb-4 sm:mb-6 border-b border-gray-700 pb-4 px-2">
-            <div>
-                <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-game-player to-game-accent bg-clip-text text-transparent">
-                    {t('title')}
-                </h1>
-                <div className="flex items-center gap-4 mt-1">
-                    <div className="flex items-center gap-1 text-yellow-400 font-bold text-sm">
-                        <Flag size={14} />
-                        <span>{t('level')} {gameState.currentLevel}</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-gray-500 font-bold text-xs">
-                        <Trophy size={12} />
-                        <span>{t('best')}: {gameState.maxLevel}</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div className="flex gap-2 sm:gap-4 items-center">
-                 {gameState.phase === 'BATTLE' && (
-                    <div className="flex items-center gap-2">
-                        <div className="text-right hidden sm:block">
-                            <div className="text-xs text-gray-400">{t('turn')}</div>
-                            <div className="text-2xl font-mono text-white">{gameState.turn}</div>
-                        </div>
-                        <div className="flex items-center gap-1 bg-gray-800 rounded border border-gray-600 ml-2 sm:ml-4 overflow-hidden">
-                            <button
-                                onClick={actions.toggleSpeed}
-                                className="flex items-center gap-1 hover:bg-gray-700 px-2 sm:px-3 py-1 transition-colors h-8 sm:h-9 border-r border-gray-600"
-                                title="Toggle Battle Speed"
-                            >
-                                <FastForward size={14} className={battleSpeed > 1 ? "text-yellow-400" : "text-gray-400"} />
-                                <span className="font-mono font-bold text-xs sm:text-sm w-4">{battleSpeed}x</span>
-                            </button>
-                            <button
-                                onClick={actions.handleSkip}
-                                className="flex items-center gap-1 hover:bg-gray-700 px-2 sm:px-3 py-1 transition-colors h-8 sm:h-9 text-blue-400 hover:text-blue-300"
-                                title="Skip Battle"
-                            >
-                                <SkipForward size={14} />
-                                <span className="font-bold text-xs hidden sm:inline">{t('skip')}</span>
-                            </button>
-                        </div>
-                    </div>
-                 )}
-
-                 {/* Exit Button always available unless in battle (or can exit battle too) */}
-                 {(gameState.phase === 'MATCHUP' || gameState.phase === 'FORMATION') && (
-                    <button 
-                        onClick={actions.handleExit}
-                        className="flex items-center gap-2 px-3 py-2 sm:px-4 rounded-lg font-semibold bg-gray-800 hover:bg-red-900/50 text-gray-400 hover:text-red-400 border border-gray-700 hover:border-red-500/50 transition-all text-sm sm:text-base"
-                    >
-                        <LogOut size={16} /> <span className="hidden sm:inline">{t('exit')}</span>
-                    </button>
-                 )}
-            </div>
-        </header>
-    );
 
     // --- FORMATION VIEW ---
     if (gameState.phase === 'FORMATION') {
         return (
             <div className="min-h-screen bg-game-bg text-gray-200 flex flex-col items-center p-2 sm:p-4 transition-colors duration-500">
-                <Header />
+                <Header gameState={gameState} battleSpeed={battleSpeed} lang={lang} t={t} toggleSpeed={actions.toggleSpeed} handleSkip={actions.handleSkip} handleExit={actions.handleExit} />
                 <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-4 lg:gap-6 h-auto lg:h-[600px]">
                     {/* Barracks */}
                     <div className="w-full lg:w-1/3 bg-game-panel rounded-xl p-4 border border-gray-700 flex flex-col h-[300px] lg:h-full">
@@ -141,14 +159,10 @@ const GameScreen: React.FC<GameScreenProps> = ({
                                         `}
                                     >
                                         <div className="w-10 h-10 rounded bg-game-player/20 flex items-center justify-center text-game-player group-hover:scale-110 transition-transform">
-                                            {key === 'KNIGHT' && <Shield size={20} />}
-                                            {key === 'BERSERKER' && <Swords size={20} />}
-                                            {key === 'MAGE' && <Flame size={20} />}
-                                            {key === 'ASSASSIN' && <Crosshair size={20} />}
-                                            {key === 'PRIEST' && <Heart size={20} />}
+                                            {UNIT_ICONS[key]}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <div className="font-bold text-sm text-gray-200 truncate">{localized.name}</div>
+                                            <div className="font-bold text-sm text-gray-200 truncate">{localized?.name ?? key}</div>
                                             <div className="text-xs text-gray-500 flex gap-2 items-center">
                                                 <span>{tmpl.role}</span>
                                                 <span className="text-blue-300">Spd: {tmpl.stats?.speed}</span>
@@ -195,7 +209,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
     if (gameState.phase === 'MATCHUP') {
         return (
             <div className="min-h-screen bg-game-bg text-gray-200 flex flex-col items-center p-4 transition-colors duration-500">
-                <Header />
+                <Header gameState={gameState} battleSpeed={battleSpeed} lang={lang} t={t} toggleSpeed={actions.toggleSpeed} handleSkip={actions.handleSkip} handleExit={actions.handleExit} />
                 <div className="flex-1 w-full max-w-6xl flex flex-col items-center justify-center mb-12">
                     {/* VS Display - Side by side forced, auto height based on aspect ratio */}
                     <div className="flex flex-row items-center justify-center gap-2 sm:gap-8 w-full">
@@ -266,7 +280,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
     // --- BATTLE VIEW ---
     return (
         <div className="min-h-screen bg-game-bg text-gray-200 flex flex-col items-center p-2 sm:p-4 transition-colors duration-500">
-          <Header />
+          <Header gameState={gameState} battleSpeed={battleSpeed} lang={lang} t={t} toggleSpeed={actions.toggleSpeed} handleSkip={actions.handleSkip} handleExit={actions.handleExit} />
     
           {/* Main Content */}
           <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-4 sm:gap-6 lg:h-[calc(100vh-100px)]">

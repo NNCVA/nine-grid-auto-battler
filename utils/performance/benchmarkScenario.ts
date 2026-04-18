@@ -26,7 +26,7 @@ export interface DeterministicBattleTurn {
   targetId: string;
 }
 
-const cloneValue = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
+const cloneValue = <T>(value: T): T => structuredClone(value) as T;
 
 const withDeterministicRandom = <T>(values: number[], callback: () => T) => {
   const originalRandom = Math.random;

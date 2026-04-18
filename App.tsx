@@ -11,12 +11,11 @@ import { Language } from './utils/i18n';
 type Screen = 'MENU' | 'GAME' | 'HELP' | 'SETTINGS';
 
 const App: React.FC = () => {
-  // Global App State
   const [screen, setScreen] = useState<Screen>('MENU');
   const [lang, setLang] = useState<Language>('zh');
   const [activeThemeId, setActiveThemeId] = useState<string>('midnight');
 
-  const hasSaveFile = !!localStorage.getItem('ng_save_data');
+  const [hasSaveFile] = useState(() => !!localStorage.getItem('ng_save_data'));
 
   // Game Logic Hook
   const { gameState, battleSpeed, damageMap, healMap, actions } = useGameLogic({

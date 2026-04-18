@@ -15,15 +15,17 @@ interface BattleUnitProps {
   onDragStart?: (e: React.DragEvent, unit: Unit) => void;
 }
 
+const ROLE_ICONS = {
+  TANK: Shield,
+  WARRIOR: Sword,
+  MAGE: Flame,
+  ASSASSIN: Crosshair,
+  SUPPORT: Heart,
+} as const;
+
 const RoleIcon = ({ role, className }: { role: string; className?: string }) => {
-  switch (role) {
-    case 'TANK': return <Shield className={className} />;
-    case 'WARRIOR': return <Sword className={className} />;
-    case 'MAGE': return <Flame className={className} />;
-    case 'ASSASSIN': return <Crosshair className={className} />;
-    case 'SUPPORT': return <Heart className={className} />;
-    default: return <Sword className={className} />;
-  }
+  const Icon = ROLE_ICONS[role as keyof typeof ROLE_ICONS] ?? Sword;
+  return <Icon className={className} />;
 };
 
 const BattleUnitComponent: React.FC<BattleUnitProps> = ({ 
