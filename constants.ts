@@ -1,6 +1,8 @@
 import { Unit } from './types';
 
 export const MAX_ENERGY = 100;
+export const ENERGY_GAIN_ATTACK = 25;
+export const ENERGY_GAIN_HIT = 10;
 export const GRID_ROWS = 3;
 export const GRID_COLS = 3;
 

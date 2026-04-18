@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Play, RotateCcw, Swords, Flame, Shield, Timer, Crosshair, Heart, Trophy, Flag, ArrowRight, FastForward, SkipForward, LogOut, Check, ChevronLeft } from 'lucide-react';
 import GameGrid from '../GameGrid';
-import { GameState } from '../../types';
+import { GameState, Unit } from '../../types';
 import { getAllUnitTemplates } from '../../services/contentService';
 import { Language, getTranslation } from '../../utils/i18n';
 import { TRANSLATIONS } from '../../constants/localization';
@@ -19,7 +19,7 @@ interface GameScreenProps {
         handleNextOrReset: () => void;
         toggleSpeed: () => void;
         handleSkip: () => void;
-        handleUnitDrop: (unit: any, r: number, c: number) => void;
+        handleUnitDrop: (unit: Unit, row: number, col: number) => void;
         addUnitFromBench: (key: string) => void;
         removeUnit: (id: string) => void;
         startBattle: () => void;
@@ -40,15 +40,14 @@ const GameScreen: React.FC<GameScreenProps> = ({
     recordRender('GameScreen');
     const t = (key: any) => getTranslation(lang, key);
     const unitTemplates = getAllUnitTemplates();
-    
-    const playerUnits = gameState.units.filter(u => u.side === 'PLAYER');
-    const enemyUnits = gameState.units.filter(u => u.side === 'ENEMY');
+
+    const playerUnits = useMemo(() => gameState.units.filter(u => u.side === 'PLAYER'), [gameState.units]);
+    const enemyUnits = useMemo(() => gameState.units.filter(u => u.side === 'ENEMY'), [gameState.units]);
     const playerUnitCount = playerUnits.length;
     const enemyUnitCount = enemyUnits.length;
 
-    // Calculate dynamic stats for preview
-    const playerSpeed = getTeamSpeed(gameState.units, 'PLAYER');
-    const enemySpeed = getTeamSpeed(gameState.units, 'ENEMY');
+    const playerSpeed = useMemo(() => getTeamSpeed(gameState.units, 'PLAYER'), [gameState.units]);
+    const enemySpeed = useMemo(() => getTeamSpeed(gameState.units, 'ENEMY'), [gameState.units]);
     
     // Header Component
     const Header = () => (

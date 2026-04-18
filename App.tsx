@@ -13,24 +13,20 @@ type Screen = 'MENU' | 'GAME' | 'HELP' | 'SETTINGS';
 const App: React.FC = () => {
   // Global App State
   const [screen, setScreen] = useState<Screen>('MENU');
-  const [hasSaveFile, setHasSaveFile] = useState(false);
   const [lang, setLang] = useState<Language>('zh');
   const [activeThemeId, setActiveThemeId] = useState<string>('midnight');
+
+  const hasSaveFile = !!localStorage.getItem('ng_save_data');
 
   // Game Logic Hook
   const { gameState, battleSpeed, damageMap, healMap, actions } = useGameLogic({
       lang,
       onExitGame: () => {
-          setHasSaveFile(true);
           setScreen('MENU');
       }
   });
 
-  // Lifecycle for Settings & Save Check
   useEffect(() => {
-    const savedData = localStorage.getItem('ng_save_data');
-    setHasSaveFile(!!savedData);
-
     const savedSettings = localStorage.getItem('ng_settings');
     if (savedSettings) {
         const { lang: l, theme: th } = JSON.parse(savedSettings);

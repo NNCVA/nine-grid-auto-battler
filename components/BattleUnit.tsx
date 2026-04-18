@@ -62,31 +62,26 @@ const BattleUnitComponent: React.FC<BattleUnitProps> = ({
       draggable={draggable}
       onDragStart={(e) => onDragStart && onDragStart(e, unit)}
     >
-        {/* Role & Name */}
         <div className="flex flex-col items-center w-full z-10">
             <RoleIcon role={unit.role} className={`w-4 h-4 sm:w-6 sm:h-6 mb-0.5 sm:mb-1 ${unit.side === 'PLAYER' ? 'text-game-player' : 'text-game-enemy'}`} />
             <span className="text-[8px] sm:text-[10px] font-bold text-white truncate w-full text-center leading-tight">{unit.name}</span>
         </div>
 
-        {/* Stats Bars */}
         <div className="w-full space-y-0.5 sm:space-y-1 mt-1 z-10">
-            {/* HP Bar */}
             <div className="w-full h-1 sm:h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                <div 
-                    className={`h-full transition-all duration-300 ${unit.side === 'PLAYER' ? 'bg-green-500' : 'bg-red-500'}`} 
+                <div
+                    className={`h-full transition-all duration-300 ${unit.side === 'PLAYER' ? 'bg-green-500' : 'bg-red-500'}`}
                     style={{ width: `${hpPercent}%` }}
                 />
             </div>
-            {/* Energy Bar */}
             <div className="w-full h-0.5 sm:h-1 bg-gray-700 rounded-full overflow-hidden">
-                <div 
-                    className={`h-full transition-all duration-300 ${isFullEnergy ? 'bg-yellow-400 animate-pulse' : 'bg-blue-500'}`} 
+                <div
+                    className={`h-full transition-all duration-300 ${isFullEnergy ? 'bg-yellow-400 animate-pulse' : 'bg-blue-500'}`}
                     style={{ width: `${energyPercent}%` }}
                 />
             </div>
         </div>
 
-        {/* Damage / Heal Numbers Popups */}
         {isTakingDamage !== null && (
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full text-red-500 font-black text-sm sm:text-xl animate-pop z-50 text-shadow">
                 -{isTakingDamage}
@@ -97,8 +92,7 @@ const BattleUnitComponent: React.FC<BattleUnitProps> = ({
                 +{isHealed}
             </div>
         )}
-        
-        {/* Active Indicator Arrow */}
+
         {isActive && (
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-yellow-400 text-xs sm:text-base">
                 ▼

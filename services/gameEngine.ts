@@ -1,6 +1,6 @@
 
 import { Unit, DamageResult, BattleLogEntry } from '../types';
-import { MAX_ENERGY } from '../constants';
+import { MAX_ENERGY, ENERGY_GAIN_ATTACK, ENERGY_GAIN_HIT } from '../constants';
 
 // Calculate standard damage
 export const calculateDamage = (attacker: Unit, defender: Unit, isSkill: boolean): DamageResult => {
@@ -229,7 +229,7 @@ export const simulateBattle = (
     }
 
     // Update Attacker Energy
-    attacker.stats.energy = isSkill ? 0 : Math.min(MAX_ENERGY, attacker.stats.energy + 25);
+    attacker.stats.energy = isSkill ? 0 : Math.min(MAX_ENERGY, attacker.stats.energy + ENERGY_GAIN_ATTACK);
 
     // Update Target
     if (isSupport) {
@@ -237,7 +237,7 @@ export const simulateBattle = (
     } else {
          target.stats.hp = Math.max(0, target.stats.hp - result.damage);
          if (target.stats.hp === 0) target.isDead = true;
-         target.stats.energy = Math.min(MAX_ENERGY, target.stats.energy + 10);
+         target.stats.energy = Math.min(MAX_ENERGY, target.stats.energy + ENERGY_GAIN_HIT);
     }
 
     // Add simplified log

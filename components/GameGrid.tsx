@@ -1,5 +1,5 @@
-import React from 'react';
-import { Unit } from '../types';
+import React, { useMemo } from 'react';
+import { Unit, GameState } from '../types';
 import BattleUnit from './BattleUnit';
 import { GRID_ROWS, GRID_COLS } from '../constants';
 import { recordRender } from '../utils/performance/renderCounters';
@@ -8,10 +8,10 @@ interface GameGridProps {
   units: Unit[];
   side: 'PLAYER' | 'ENEMY';
   activeUnitId: string | null;
-  damageMap: Record<string, number>; // unitId -> damage amount
-  healMap: Record<string, number>; // unitId -> heal amount
-  phase: string;
-  onUnitDrop?: (unitData: any, row: number, col: number) => void;
+  damageMap: Record<string, number>;
+  healMap: Record<string, number>;
+  phase: GameState['phase'];
+  onUnitDrop?: (unitData: Unit, row: number, col: number) => void;
   onUnitRemove?: (unitId: string) => void;
 }
 
@@ -27,6 +27,16 @@ const GameGridComponent: React.FC<GameGridProps> = ({
 }) => {
   recordRender(`GameGrid:${side}`);
   const isPlayer = side === 'PLAYER';
+
+  const unitMap = useMemo(() => {
+    const map: Record<string, Unit> = {};
+    for (const u of units) {
+      if (u.side === side) {
+        map[`${u.row}-${u.col}`] = u;
+      }
+    }
+    return map;
+  }, [units, side]);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -56,7 +66,7 @@ const GameGridComponent: React.FC<GameGridProps> = ({
       >
         {Array.from({ length: GRID_ROWS }).map((_, rowIndex) => (
           Array.from({ length: GRID_COLS }).map((_, colIndex) => {
-            const unit = units.find(u => u.row === rowIndex && u.col === colIndex && u.side === side);
+            const unit = unitMap[`${rowIndex}-${colIndex}`];
             
             // Allow interaction only in FORMATION phase for player
             const canInteract = phase === 'FORMATION' && isPlayer;
