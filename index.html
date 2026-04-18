@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nine-Grid Auto Battler</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              game: {
+                bg: 'var(--game-bg)',
+                panel: 'var(--game-panel)',
+                accent: 'var(--game-accent)',
+                player: 'var(--game-player)',
+                enemy: 'var(--game-enemy)',
+              }
+            },
+            animation: {
+              'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+              'pop': 'pop 0.3s ease-out',
+              'slash': 'slash 0.2s ease-in-out',
+            },
+            keyframes: {
+              shake: {
+                '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+              },
+              pop: {
+                '0%': { transform: 'scale(0.8)', opacity: 0 },
+                '100%': { transform: 'scale(1)', opacity: 1 }
+              },
+              slash: {
+                '0%': { transform: 'scale(1)' },
+                '50%': { transform: 'scale(1.2) rotate(5deg)' },
+                '100%': { transform: 'scale(1)' }
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      :root {
+        --game-bg: #1a1b26;
+        --game-panel: #24283b;
+        --game-accent: #7aa2f7;
+        --game-player: #4fd6be;
+        --game-enemy: #f7768e;
+      }
+      body {
+        background-color: var(--game-bg);
+        color: #c0caf5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        transition: background-color 0.5s ease;
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--game-panel);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #414868;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #565f89;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

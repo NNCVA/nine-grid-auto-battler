@@ -1,0 +1,5 @@
+{
+  "name": "Nine-Grid Auto Battler",
+  "description": "A strategic 3x3 turn-based auto-battle game similar to Legend of Aoqi. Place your units, manage your formation, and watch the automatic combat unfold with skills and ultimate attacks.",
+  "requestFramePermissions": []
+}
