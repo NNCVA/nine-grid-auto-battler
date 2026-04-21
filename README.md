@@ -36,18 +36,41 @@ npm run build
 ## Project Structure
 
 ```
+src/
+├── assets/              # Static assets
 ├── components/          # React components
-│   ├── screens/        # Game screens (MainMenu, GameScreen, HelpScreen, SettingsScreen)
-│   ├── BattleUnit.tsx  # Unit display component
-│   └── GameGrid.tsx    # 3x3 grid component
-├── hooks/              # React hooks
-│   └── gameLogic/      # Core game logic hooks
-├── services/           # Game services
-│   └── gameEngine.ts   # Battle simulation engine
-├── constants/          # Game constants and themes
-├── data/               # Unit templates and configuration
-├── types.ts            # TypeScript type definitions
-└── utils/              # Utility functions
+│   └── game/            # Game-specific components
+│       ├── BattleUnit.tsx   # Unit display component
+│       └── GameGrid.tsx      # 3x3 grid component
+├── config/              # Application configuration
+│   ├── constants.ts     # Game constants (grid size, energy values)
+│   ├── localization.ts  # i18n translations
+│   └── themes.ts       # Theme definitions
+├── constants/           # Static game data
+│   └── game/
+│       └── unitTemplates.ts  # Unit type definitions
+├── hooks/               # React hooks
+│   ├── gameLogic/      # Core game logic
+│   │   ├── battleProgression.ts
+│   │   ├── formationActions.ts
+│   │   ├── initialization.ts
+│   │   └── persistenceActions.ts
+│   └── useGameLogic.ts # Main game state hook
+├── pages/               # Screen components
+│   ├── MainMenu.tsx
+│   ├── GameScreen.tsx
+│   ├── HelpScreen.tsx
+│   └── SettingsScreen.tsx
+├── services/            # Business logic services
+│   ├── contentService.ts  # Unit template service
+│   └── gameEngine.ts      # Battle simulation engine
+├── types/                # TypeScript type definitions
+│   └── types.ts
+├── utils/                # Utility functions
+│   ├── i18n.ts
+│   └── performance/       # Performance monitoring
+├── App.tsx
+└── index.tsx
 ```
 
 ## Scripts
