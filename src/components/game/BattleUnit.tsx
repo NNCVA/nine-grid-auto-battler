@@ -2,8 +2,8 @@
 import React from 'react';
 import { Unit } from '../types';
 import { Shield, Sword, Flame, Crosshair, Heart, Skull } from 'lucide-react';
-import { MAX_ENERGY } from '../constants';
-import { recordRender } from '../utils/performance/renderCounters';
+import { MAX_ENERGY } from '../../config/constants';
+import { recordRender } from '../../utils/performance/renderCounters';
 
 interface BattleUnitProps {
   unit: Unit;

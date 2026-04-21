@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { THEMES } from './constants/themes';
+import { THEMES } from './config/themes';
 import { useGameLogic } from './hooks/useGameLogic';
-import MainMenu from './components/screens/MainMenu';
-import SettingsScreen from './components/screens/SettingsScreen';
-import HelpScreen from './components/screens/HelpScreen';
-import GameScreen from './components/screens/GameScreen';
+import MainMenu from './pages/MainMenu';
+import SettingsScreen from './pages/SettingsScreen';
+import HelpScreen from './pages/HelpScreen';
+import GameScreen from './pages/GameScreen';
 import { Language } from './utils/i18n';
 
 type Screen = 'MENU' | 'GAME' | 'HELP' | 'SETTINGS';

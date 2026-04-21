@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Settings, ChevronLeft, Globe, Palette } from 'lucide-react';
-import { THEMES } from '../../constants/themes';
-import { Language, getTranslation } from '../../utils/i18n';
+import { THEMES } from '../config/themes';
+import { Language, getTranslation } from '../utils/i18n';
 
 interface SettingsScreenProps {
     lang: Language;

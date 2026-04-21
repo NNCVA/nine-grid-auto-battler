@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { Unit, GameState } from '../types';
 import BattleUnit from './BattleUnit';
-import { GRID_ROWS, GRID_COLS } from '../constants';
-import { recordRender } from '../utils/performance/renderCounters';
+import { GRID_ROWS, GRID_COLS } from '../../config/constants';
+import { recordRender } from '../../utils/performance/renderCounters';
 
 interface GameGridProps {
   units: Unit[];

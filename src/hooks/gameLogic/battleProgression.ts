@@ -1,4 +1,4 @@
-import { TRANSLATIONS } from '../../constants/localization';
+import { TRANSLATIONS } from '../../config/localization';
 import {
   calculateDamage,
   calculateHeal,

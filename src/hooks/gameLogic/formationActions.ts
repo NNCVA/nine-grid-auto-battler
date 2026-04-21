@@ -1,5 +1,5 @@
-import { createUnit } from '../../constants';
-import { TRANSLATIONS } from '../../constants/localization';
+import { createUnit } from '../../config/constants';
+import { TRANSLATIONS } from '../../config/localization';
 import { getUnitTemplate } from '../../services/contentService';
 import { GameState, Unit } from '../../types';
 import { Language } from '../../utils/i18n';

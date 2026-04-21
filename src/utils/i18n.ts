@@ -1,5 +1,5 @@
 
-import { TRANSLATIONS } from '../constants/localization';
+import { TRANSLATIONS } from '../config/localization';
 
 export type Language = 'en' | 'zh';
 

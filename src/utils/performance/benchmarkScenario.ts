@@ -1,4 +1,4 @@
-import { createUnit, MAX_ENERGY } from '../../constants';
+import { createUnit, MAX_ENERGY } from '../../config/constants';
 import {
   calculateDamage,
   findTarget,

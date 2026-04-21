@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { TRANSLATIONS } from '../constants/localization';
+import { TRANSLATIONS } from '../config/localization';
 import { GameState, Unit } from '../types';
 import { Language, getTranslation } from '../utils/i18n';
 import {

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Play, Swords, BookOpen, Settings } from 'lucide-react';
-import { Language, getTranslation } from '../../utils/i18n';
+import { Language, getTranslation } from '../utils/i18n';
 
 interface MainMenuProps {
     lang: Language;

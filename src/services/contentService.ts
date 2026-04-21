@@ -1,4 +1,4 @@
-import { UNIT_TEMPLATES } from '../data/unitTemplates';
+import { UNIT_TEMPLATES } from '../constants/game/unitTemplates';
 import { UnitTemplate, UnitTemplateMap } from '../types';
 
 export const getUnitTemplate = (key: string): UnitTemplate => {

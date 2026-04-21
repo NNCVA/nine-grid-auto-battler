@@ -1,6 +1,6 @@
 
 import { Unit, DamageResult, BattleLogEntry } from '../types';
-import { MAX_ENERGY, ENERGY_GAIN_ATTACK, ENERGY_GAIN_HIT } from '../constants';
+import { MAX_ENERGY, ENERGY_GAIN_ATTACK, ENERGY_GAIN_HIT } from '../config/constants';
 
 // Calculate standard damage
 export const calculateDamage = (attacker: Unit, defender: Unit, isSkill: boolean): DamageResult => {

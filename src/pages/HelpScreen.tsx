@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { ChevronLeft, Shield, Swords, Flame, Crosshair, Heart, BookOpen } from 'lucide-react';
-import { Language, getTranslation } from '../../utils/i18n';
-import { TRANSLATIONS } from '../../constants/localization';
+import { Language, getTranslation } from '../utils/i18n';
+import { TRANSLATIONS } from '../config/localization';
 
 interface HelpScreenProps {
     lang: Language;

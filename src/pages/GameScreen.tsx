@@ -1,13 +1,13 @@
 
 import React, { useMemo, useCallback } from 'react';
 import { Play, RotateCcw, Swords, Flame, Shield, Timer, Crosshair, Heart, Trophy, Flag, ArrowRight, FastForward, SkipForward, LogOut, Check, ChevronLeft } from 'lucide-react';
-import GameGrid from '../GameGrid';
-import { GameState, Unit } from '../../types';
-import { getAllUnitTemplates } from '../../services/contentService';
-import { Language, getTranslation } from '../../utils/i18n';
-import { TRANSLATIONS } from '../../constants/localization';
-import { getTeamSpeed } from '../../services/gameEngine';
-import { recordRender } from '../../utils/performance/renderCounters';
+import GameGrid from '../components/game/GameGrid';
+import { GameState, Unit } from '../types';
+import { getAllUnitTemplates } from '../services/contentService';
+import { Language, getTranslation } from '../utils/i18n';
+import { TRANSLATIONS } from '../config/localization';
+import { getTeamSpeed } from '../services/gameEngine';
+import { recordRender } from '../utils/performance/renderCounters';
 
 type TranslationKey = keyof typeof TRANSLATIONS.en;
 
